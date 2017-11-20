@@ -1,14 +1,15 @@
 import React from 'react'
-import {Button, StyleSheet, Text, View} from 'react-native'
+import {Button, Text, View} from 'react-native'
 import {connect} from 'react-redux'
 import Expo from 'expo'
 import {ANDROID_CLIENT_ID, IOS_CLIENT_ID} from 'react-native-dotenv'
 
-import {doGoogleLogin, resetGoogleAccessToken, storeGoogleAccessToken, setStatus} from './actions'
-import {readAccessToken} from './storage'
-import Scanner from './view/scanner'
+import {doGoogleLogin, resetGoogleAccessToken, storeGoogleAccessToken, setStatus} from '../actions'
+import {readAccessToken} from '../storage'
+import Scanner from './scanner'
+import {Container} from './style'
 
-async function signInWithGoogleAsync() {
+async function signInWithGoogleAsync(storeAccessToken) {
   try {
     const result = await Expo.Google.logInAsync({
       androidClientId: ANDROID_CLIENT_ID,
@@ -17,12 +18,13 @@ async function signInWithGoogleAsync() {
     })
 
     if (result.type === 'success') {
-      return result.accessToken
+      return storeAccessToken(result.accessToken)
     }
-    return {cancelled: true}
+    console.log("Login cancelled")
   } catch (e) {
-    return {error: true}
+    console.log("Login failed")
   }
+  return storeAccessToken(null)
 }
 
 export class MainView extends React.Component {
@@ -46,15 +48,14 @@ export class MainView extends React.Component {
     } = this.props
     const storeToken = async () => {
       startGoogleLogin()
-      const token = await signInWithGoogleAsync()
-      storeAccessToken(token)
+      signInWithGoogleAsync(storeAccessToken)
     }
     const getChecked = (row, index) => index !== 0 && row.length > 16 && row[16]
     const ticketStatus = sheet
       ? `${sheet.values.filter(getChecked).length}/${sheet.values.length - 1}`
       : '0/0'
     return (
-      <View style={styles.container}>
+      <Container>
         {user ? (
           <View>
             {status === 'SCAN_CODE' ? (
@@ -86,19 +87,10 @@ export class MainView extends React.Component {
             )}
           </View>
         )}
-      </View>
+      </Container>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-})
 
 const mapStateToProps = ({accessToken, user, sheet, status}) => ({
   status,

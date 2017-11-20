@@ -2,6 +2,7 @@ import {AsyncStorage} from 'react-native'
 
 export const saveAccessToken = async accessToken => {
   try {
+    console.log(accessToken)
     if (accessToken) {
       await AsyncStorage.setItem('@AccessToken:key', accessToken)
     } else {
