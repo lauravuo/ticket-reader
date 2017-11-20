@@ -6,7 +6,7 @@ import {ANDROID_CLIENT_ID, IOS_CLIENT_ID} from 'react-native-dotenv'
 
 import {doGoogleLogin, resetGoogleAccessToken, storeGoogleAccessToken, setStatus} from './actions'
 import {readAccessToken} from './storage'
-import Scanner from './scanner'
+import Scanner from './view/scanner'
 
 async function signInWithGoogleAsync() {
   try {

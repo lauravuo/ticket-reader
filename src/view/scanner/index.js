@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Dimensions, LayoutAnimation, Text, View, StatusBar, StyleSheet} from 'react-native'
 import {BarCodeScanner, Permissions} from 'expo'
 import {connect} from 'react-redux'
-import {scannerSetCameraPermission, scannerSetLastScanned, setStatus} from '../actions'
+import {scannerSetCameraPermission, scannerSetLastScanned, setStatus} from '../../actions'
 
 const requestCameraPermission = async saveFn => {
   const {status} = await Permissions.askAsync(Permissions.CAMERA)
