@@ -14,10 +14,14 @@ const initialStatus = 'NOT_LOGGED_IN'
 const saveStatus = (state, action) => action.payload
 const userLoggingIn = () => 'MAIN_LOADING'
 const userDataReceived = () => 'MAIN'
+const codeOk = () => 'CODE_OK'
+const codeNok = () => 'CODE_NOK'
 const status = createReducer(initialStatus, {
   SET_STATUS: saveStatus,
   DO_GOOGLE_LOGIN: userLoggingIn,
-  FETCH_USER_FULFILLED: userDataReceived
+  FETCH_USER_FULFILLED: userDataReceived,
+  SCANNER_CODE_VALID: codeOk,
+  SCANNER_CODE_INVALID: codeNok
 })
 
 const initialToken = null

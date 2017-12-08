@@ -42,6 +42,15 @@ const epicMiddleware = createEpicMiddleware(epics, {
         headers: Object.assign({}, headers, customHeaders),
         responseType: responseType || 'json',
         crossDomain: true
+      }),
+    put: (url, body, customHeaders, responseType) =>
+      ajax({
+        method: 'PUT',
+        url,
+        body,
+        headers: Object.assign({}, headers, customHeaders),
+        responseType: responseType || 'json',
+        crossDomain: true
       })
   },
   epicAdapter

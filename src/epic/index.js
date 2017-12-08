@@ -11,10 +11,16 @@ import {GOOGLE_SHEET_ID} from 'react-native-dotenv'
 import {
   STORE_GOOGLE_ACCESS_TOKEN,
   FETCH_USER_FULFILLED,
+  SCANNER_SET_LAST_SCANNED,
+  FETCH_SHEET_FULFILLED,
   fetchUserFulfilled,
   fetchUserFailed,
   fetchSheetFulfilled,
-  fetchSheetFailed
+  fetchSheetFailed,
+  scannerResetLastScanned,
+  scannerUpdateFailed,
+  scannerCodeValid,
+  scannerCodeInvalid
 } from '../actions'
 
 const fetchUserEpic = (action$, store, {get}) =>
@@ -27,9 +33,11 @@ const fetchUserEpic = (action$, store, {get}) =>
   )
 
 const fetchSheetEpic = (action$, store, {get}) =>
-  action$.ofType(FETCH_USER_FULFILLED).mergeMap(() =>
+  action$.ofType(FETCH_USER_FULFILLED, SCANNER_SET_LAST_SCANNED).mergeMap(() =>
     get(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1!A1:Q1000?majorDimension=ROWS`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${
+        GOOGLE_SHEET_ID
+      }/values/Sheet1!A1:Q1000?majorDimension=ROWS`,
       {
         Authorization: `Bearer ${store.getState().accessToken}`
       }
@@ -38,4 +46,40 @@ const fetchSheetEpic = (action$, store, {get}) =>
       .catch(error => Observable.of(fetchSheetFailed(error)))
   )
 
-export default combineEpics(fetchUserEpic, fetchSheetEpic)
+const getRangeForUpdate = (scanned, sheet) => {
+  const selected = sheet.values.find(row => row[2] === scanned)
+  if (!selected || selected[16]) {
+    return null
+  }
+  const rowNumber = sheet.values.indexOf(selected) + 1
+  return `Sheet1!Q${rowNumber}`
+}
+
+const updateSheetWithScannedEpic = (action$, store, {put}) =>
+  action$.ofType(FETCH_SHEET_FULFILLED).mergeMap(action => {
+    const scanned = store.getState().scanner.lastScanned
+    if (scanned) {
+      const range = getRangeForUpdate(scanned, action.payload)
+      if (range) {
+        return put(
+          `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/${
+            range
+          }?valueInputOption=USER_ENTERED`,
+          {
+            range,
+            values: [[new Date().getTime().toString()]],
+            majorDimension: 'ROWS'
+          },
+          {
+            Authorization: `Bearer ${store.getState().accessToken}`
+          }
+        )
+          .mergeMap(() => Observable.of(scannerResetLastScanned(), scannerCodeValid()))
+          .catch(() => Observable.of(scannerUpdateFailed()))
+      }
+      return Observable.of(scannerCodeInvalid())
+    }
+    return Observable.of(scannerResetLastScanned())
+  })
+
+export default combineEpics(fetchUserEpic, fetchSheetEpic, updateSheetWithScannedEpic)

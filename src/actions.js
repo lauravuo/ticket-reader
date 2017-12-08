@@ -10,6 +10,10 @@ export const SET_STATUS = 'SET_STATUS'
 
 export const SCANNER_SET_CAMERA_PERMISSION = 'SCANNER_SET_CAMERA_PERMISSION'
 export const SCANNER_SET_LAST_SCANNED = 'SCANNER_SET_LAST_SCANNED'
+export const SCANNER_RESET_LAST_SCANNED = 'SCANNER_RESET_LAST_SCANNED'
+export const SCANNER_CODE_VALID = 'SCANNER_CODE_VALID'
+export const SCANNER_CODE_INVALID = 'SCANNER_CODE_INVALID'
+export const SCANNER_UPDATE_FAILED = 'SCANNER_UPDATE_FAILED'
 
 export const doGoogleLogin = () => ({
   type: DO_GOOGLE_LOGIN
@@ -63,4 +67,20 @@ export const scannerSetCameraPermission = cameraPermission => ({
 export const scannerSetLastScanned = lastScanned => ({
   type: SCANNER_SET_LAST_SCANNED,
   lastScanned
+})
+
+export const scannerResetLastScanned = () => ({
+  type: SCANNER_RESET_LAST_SCANNED
+})
+
+export const scannerCodeValid = () => ({
+  type: SCANNER_CODE_VALID
+})
+
+export const scannerCodeInvalid = () => ({
+  type: SCANNER_CODE_INVALID
+})
+
+export const scannerUpdateFailed = () => ({
+  type: SCANNER_UPDATE_FAILED
 })

@@ -7,7 +7,7 @@ import {ANDROID_CLIENT_ID, IOS_CLIENT_ID} from 'react-native-dotenv'
 import {doGoogleLogin, resetGoogleAccessToken, storeGoogleAccessToken, setStatus} from '../actions'
 import {readAccessToken} from '../storage'
 import Scanner from './scanner'
-import {Container} from './style'
+import {Container, Message, NokView, OkView} from './style'
 
 async function signInWithGoogleAsync(storeAccessToken) {
   try {
@@ -20,11 +20,34 @@ async function signInWithGoogleAsync(storeAccessToken) {
     if (result.type === 'success') {
       return storeAccessToken(result.accessToken)
     }
-    console.log("Login cancelled")
+    console.log('Login cancelled')
   } catch (e) {
-    console.log("Login failed")
+    console.log('Login failed')
   }
   return storeAccessToken(null)
+}
+
+const getFullScreenView = (status, goToMain) => {
+  switch (status) {
+    case 'CODE_OK':
+      return (
+        <OkView>
+          <Message>Ticket OK!</Message>
+          <Button onPress={goToMain} title="Back" />
+        </OkView>
+      )
+    case 'CODE_NOK':
+      return (
+        <NokView>
+          <Message>Ticket invalid!</Message>
+          <Button onPress={goToMain} title="Back" />
+        </NokView>
+      )
+    case 'SCAN_CODE':
+      return <Scanner />
+    default:
+      return null
+  }
 }
 
 export class MainView extends React.Component {
@@ -54,13 +77,12 @@ export class MainView extends React.Component {
     const ticketStatus = sheet
       ? `${sheet.values.filter(getChecked).length}/${sheet.values.length - 1}`
       : '0/0'
+    const fullScreenView = getFullScreenView(status, goToMain)
     return (
       <Container>
         {user ? (
           <View>
-            {status === 'SCAN_CODE' ? (
-              <Scanner />
-            ) : (
+            {fullScreenView || (
               <View>
                 <Text>Logged in as {user.email}</Text>
                 {sheet && <Text>Tickets scanned: {ticketStatus}</Text>}
