@@ -38,6 +38,7 @@ class Scanner extends Component {
         ) : (
           <BarCodeScanner
             onBarCodeRead={handleBarCodeRead}
+            torchMode="on"
             style={{
               height: Dimensions.get('window').height,
               width: Dimensions.get('window').width
