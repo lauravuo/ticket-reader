@@ -77,7 +77,7 @@ const updateSheetWithScannedEpic = (action$, store, {put}) =>
           .mergeMap(() => Observable.of(scannerResetLastScanned(), scannerCodeValid()))
           .catch(() => Observable.of(scannerUpdateFailed()))
       }
-      return Observable.of(scannerCodeInvalid())
+      return Observable.of(scannerResetLastScanned(), scannerCodeInvalid())
     }
     return Observable.of(scannerResetLastScanned())
   })

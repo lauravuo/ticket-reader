@@ -16,12 +16,14 @@ const userLoggingIn = () => 'MAIN_LOADING'
 const userDataReceived = () => 'MAIN'
 const codeOk = () => 'CODE_OK'
 const codeNok = () => 'CODE_NOK'
+const resetStatus = () => initialStatus
 const status = createReducer(initialStatus, {
   SET_STATUS: saveStatus,
   DO_GOOGLE_LOGIN: userLoggingIn,
   FETCH_USER_FULFILLED: userDataReceived,
   SCANNER_CODE_VALID: codeOk,
-  SCANNER_CODE_INVALID: codeNok
+  SCANNER_CODE_INVALID: codeNok,
+  RESET_GOOGLE_ACCESS_TOKEN: resetStatus
 })
 
 const initialToken = null
@@ -58,9 +60,11 @@ const initialScanner = {cameraPermission: false, lastScanned: ''}
 const setCameraPermission = (state, action) =>
   updateObject(state, {cameraPermission: action.cameraPermission})
 const setLastScanned = (state, action) => updateObject(state, {lastScanned: action.lastScanned})
+const resetLastScanned = (state, action) => ({...state, lastScanned: action.lastScanned})
 const scanner = createReducer(initialScanner, {
   SCANNER_SET_CAMERA_PERMISSION: setCameraPermission,
-  SCANNER_SET_LAST_SCANNED: setLastScanned
+  SCANNER_SET_LAST_SCANNED: setLastScanned,
+  SCANNER_RESET_LAST_SCANNED: resetLastScanned
 })
 
 export default combineReducers({

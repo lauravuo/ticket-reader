@@ -25,7 +25,6 @@ class Scanner extends Component {
       if (result.data !== lastScanned) {
         LayoutAnimation.spring()
         saveLastScanned(result.data)
-        console.log(result.data)
         goBackToMain()
       }
     }
